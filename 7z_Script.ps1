@@ -18,7 +18,7 @@ D:\BPS\DMS\Logs\aaa.zip D:\BPS\DMS\Logs\DMSweb_2019-02-01_01.log
 
 $string = "DMSweb_2019-02-01_00.log"
 $a = $string.split('-')[1]
-echo $a
+#echo $a
 
 
 $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
