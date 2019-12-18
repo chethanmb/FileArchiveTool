@@ -1,3 +1,30 @@
+$logFile = "D:\BPS\DMS\Logs\7zLogs\7z.log"
+Function writeLog {
+   [CmdletBinding()]
+   Param(
+   [Parameter(Mandatory=$False)]
+   [ValidateSet("INFO","WARN","ERROR","FATAL","DEBUG")]
+   [String]
+   $Level = "INFO",
+
+   [Parameter(Mandatory=$True)]
+   [string]
+   $Message,
+
+   [Parameter(Mandatory=$False)]
+   [string]
+   $logfile
+   )
+
+   $Stamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
+   $Line = "$Stamp $Level $Message"
+   If($logfile) {
+       Add-Content $logfile -Value $Line
+   }
+   Else {
+       Write-Output $Line
+   }
+}
 
 if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) 
 {throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
@@ -9,8 +36,8 @@ $inDir = "D:\BPS\DMS\Logs\"
 $bkpDir = "$outDir\logfiles_backup"
 #$7zLogs = "$outDir\7zLogs"
 $Month = Get-Date -Format "MM"
-$logFile = "D:\BPS\DMS\Logs\7zLogs\7z.log"
-.writeLog
+
+
 #7z a -mx5 
 #D:\BPS\DMS\Logs\aaa.zip D:\BPS\DMS\Logs\DMSweb_2019-02-01_01.log
 #"DMSweb_2019-02-01_00.log" -match "DMSweb_\d{4}-\d{2}-\d{2}_\d{2}.log"
@@ -31,7 +58,8 @@ $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
  {
  
  #echo "yes"
- 7z u -t7z $outDir\$a.zip $inDir\$Filename 
+ 7z u -mx2 $outDir\$a.zip $inDir\$Filename 
+ 
  }
  else 
  {
@@ -76,10 +104,12 @@ $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
 
  
  
- if(-not (Get-ChildItem -Path $outDir) | Where-Object{$_.Name -match "[A-Z]{3}.zip"} `
- | Move-Item -Destination $outDir\ArchivedFiles\ -Force)
+ (Get-ChildItem -Path $outDir) | Where-Object{$_.Name -match "[A-Z]{3}.zip"} `
+ | Move-Item -Destination $outDir\ArchivedFiles\ -Force
+
+ writeLog -Message "Zips moved"
  
- {}
+ #{throw "xxxxxxx"}
  
 }
 
