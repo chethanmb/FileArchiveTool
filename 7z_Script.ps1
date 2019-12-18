@@ -7,8 +7,10 @@ set-alias 7z "$env:ProgramFiles\7-Zip\7z.exe"
 $outDir = "D:\BPS\DMS\Logs\"
 $inDir = "D:\BPS\DMS\Logs\"
 $bkpDir = "$outDir\logfiles_backup"
+#$7zLogs = "$outDir\7zLogs"
 $Month = Get-Date -Format "MM"
- 
+$logFile = "D:\BPS\DMS\Logs\7zLogs\7z.log"
+.writeLog
 #7z a -mx5 
 #D:\BPS\DMS\Logs\aaa.zip D:\BPS\DMS\Logs\DMSweb_2019-02-01_01.log
 #"DMSweb_2019-02-01_00.log" -match "DMSweb_\d{4}-\d{2}-\d{2}_\d{2}.log"
@@ -37,7 +39,8 @@ $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
  }
  }
  
- Move-Item -Path $outDir\*.log -Destination $outDir\logfiles_backup\ -force
+ Get-ChildItem -Path $outDir | Where-Object{$_.Name -match "DMSweb_\d{4}-\d{2}-\d{2}_\d{2}.log"} | `
+ Move-Item -Destination $outDir\logfiles_backup\ -Force
 
 
  $zipFilenames = (Get-ChildItem -Path $inDir\*.zip ).Name
@@ -70,14 +73,17 @@ $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
     12.zip { $a = "Dec"; Rename-Item -force -Path D:\BPS\DMS\Logs\$zipFilename -NewName  "$a.zip";break}
  }
  Start-Sleep -Seconds 1
- if(-not (Get-ChildItem -Path $outDir) | Where-Object{$_.Name -match "[A-Z]{3}"} `
- | Move-Item -Destination $outDir\logfiles_backup\ -Force)
- 
- {throw "0 zipped files moved..."}
- }
 
- if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) 
-{throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
+ 
+ 
+ if(-not (Get-ChildItem -Path $outDir) | Where-Object{$_.Name -match "[A-Z]{3}.zip"} `
+ | Move-Item -Destination $outDir\ArchivedFiles\ -Force)
+ 
+ {}
+ 
+}
+
+ 
  
  #$zipFilenames = (Get-ChildItem -Path $inDir\*.zip ).Name
  #foreach($zipFilename in $zipFilenames)

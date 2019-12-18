@@ -1,19 +1,26 @@
-function writeLog {
+Function writeLog {
     [CmdletBinding()]
-    param(
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [string]$Message,
+    Param(
+    [Parameter(Mandatory=$False)]
+    [ValidateSet("INFO","WARN","ERROR","FATAL","DEBUG")]
+    [String]
+    $Level = "INFO",
 
-        [Parameter()]
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet('Information','Warning','Error')]
-        [string]$Severity = 'Information'
+    [Parameter(Mandatory=$True)]
+    [string]
+    $Message,
+
+    [Parameter(Mandatory=$False)]
+    [string]
+    $logfile
     )
 
-    [pscustomobject]@{
-        Time = (Get-Date -f g)
-        Message = $Message
-        Severity = $Severity
-    } | Export-Csv -Path "$outDir" -Append -NoTypeInformation
+    $Stamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
+    $Line = "$Stamp $Level $Message"
+    If($logfile) {
+        Add-Content $logfile -Value $Line
+    }
+    Else {
+        Write-Output $Line
+    }
 }
