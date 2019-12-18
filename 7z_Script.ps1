@@ -3,21 +3,17 @@ if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe"))
 {throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
 set-alias 7z "$env:ProgramFiles\7-Zip\7z.exe"
 
-
  ##New-Item -Path "$outDir" -Name "logfiles_backup" -ItemType "directory"
 $outDir = "D:\BPS\DMS\Logs\"
 $inDir = "D:\BPS\DMS\Logs\"
 $bkpDir = "$outDir\logfiles_backup"
 $Month = Get-Date -Format "MM"
  
-7z a -mx5 
-
-D:\BPS\DMS\Logs\aaa.zip D:\BPS\DMS\Logs\DMSweb_2019-02-01_01.log
-
-"DMSweb_2019-02-01_00.log" -match "DMSweb_\d{4}-\d{2}-\d{2}_\d{2}.log"
-
-$string = "DMSweb_2019-02-01_00.log"
-$a = $string.split('-')[1]
+#7z a -mx5 
+#D:\BPS\DMS\Logs\aaa.zip D:\BPS\DMS\Logs\DMSweb_2019-02-01_01.log
+#"DMSweb_2019-02-01_00.log" -match "DMSweb_\d{4}-\d{2}-\d{2}_\d{2}.log"
+#$string = "DMSweb_2019-02-01_00.log"
+#$a = $string.split('-')[1]
 #echo $a
 
 
@@ -33,7 +29,7 @@ $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
  {
  
  #echo "yes"
- 7z u -mx2 $outDir\$a.zip $inDir\$Filename 
+ 7z u -t7z $outDir\$a.zip $inDir\$Filename 
  }
  else 
  {
@@ -74,15 +70,18 @@ $FileNames = (Get-ChildItem -Path $inDir\*.log ).Name
     12.zip { $a = "Dec"; Rename-Item -force -Path D:\BPS\DMS\Logs\$zipFilename -NewName  "$a.zip";break}
  }
  Start-Sleep -Seconds 1
- ((Get-ChildItem -Path $outDir).Name) | Where Name -match (Get-Date -format MMM)) | Move-Item -Destination $outDir\logfiles_backup\ -force
-
+ if(-not (Get-ChildItem -Path $outDir) | Where-Object{$_.Name -match "[A-Z]{3}"} `
+ | Move-Item -Destination $outDir\logfiles_backup\ -Force)
+ 
+ {throw "0 zipped files moved..."}
  }
 
+ if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) 
+{throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
  
- 
- $zipFilenames = (Get-ChildItem -Path $inDir\*.zip ).Name
- foreach($zipFilename in $zipFilenames)
- {
+ #$zipFilenames = (Get-ChildItem -Path $inDir\*.zip ).Name
+ #foreach($zipFilename in $zipFilenames)
+ #{
 
- Rename-Item -force -Path D:\BPS\DMS\Logs\$zipFilename -NewName  "$a.zip"
- }
+ #Rename-Item -force -Path D:\BPS\DMS\Logs\$zipFilename -NewName  "$a.zip"
+ #}
